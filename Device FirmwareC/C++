@@ -1,0 +1,649 @@
+#include "callbacks.h"
+
+//HEADER START
+
+//HEADER END
+
+void ATMO_Setup() {
+
+}
+
+
+ATMO_Status_t Interval_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Interval_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_INTERVAL_Handle_t intervalHandle;
+    ATMO_INTERVAL_AddAbilityInterval(
+		ATMO_PROPERTY(Interval, instance), 
+		ATMO_ABILITY(Interval, interval), 
+		ATMO_PROPERTY(Interval, time), 
+		&intervalHandle
+	);
+	
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Interval_interval(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t BME680_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t BME680_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+BME680_Config_t config;
+config.i2cInstance = ATMO_PROPERTY(BME680, i2cInstance );
+
+if ( !BME680_Init( &config ) )
+{
+	return ATMO_Status_Fail;
+}
+
+return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t BME680_readTemperature(ATMO_Value_t *in, ATMO_Value_t *out) {
+float temperature = 0.0;
+
+if ( BME680_GetTempData( &temperature ) != BME680_Status_Success )
+{
+	return ATMO_Status_Fail;
+}
+
+ATMO_CreateValueFloat( out, temperature );
+
+return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t BME680_readHumidity(ATMO_Value_t *in, ATMO_Value_t *out) {
+float humidity = 0.0;
+
+if ( BME680_GetHumidity( &humidity ) != BME680_Status_Success )
+{
+	return ATMO_Status_Fail;
+}
+
+ATMO_CreateValueFloat( out, humidity );
+
+return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t BME680_readPressure(ATMO_Value_t *in, ATMO_Value_t *out) {
+float pressure = 0.0;
+
+if ( BME680_GetPressure( &pressure ) != BME680_Status_Success )
+{
+	return ATMO_Status_Fail;
+}
+
+ATMO_CreateValueFloat( out, pressure );
+
+return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Temperature_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Temperature_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_BLE_GATTSAddService(
+		ATMO_PROPERTY(Temperature, instance),
+		&ATMO_VARIABLE(Temperature, bleServiceHandle), 
+		ATMO_PROPERTY(Temperature, bleServiceUuid));
+	
+	uint8_t property = 0;
+	uint8_t permission = 0;
+	
+	property |= ATMO_PROPERTY(Temperature, read) ? ATMO_BLE_Property_Read : 0;
+	property |= ATMO_PROPERTY(Temperature, write) ? ATMO_BLE_Property_Write : 0;
+	property |= ATMO_PROPERTY(Temperature, notify) ? ATMO_BLE_Property_Notify : 0;
+
+	permission |= ATMO_PROPERTY(Temperature, read) ? ATMO_BLE_Permission_Read : 0;
+	permission |= ATMO_PROPERTY(Temperature, write) ? ATMO_BLE_Permission_Write : 0;
+
+	ATMO_DATATYPE types[3] = {ATMO_PROPERTY(Temperature, writeDataType), ATMO_PROPERTY(Temperature, readDataType), ATMO_PROPERTY(Temperature, notifyDataType)};
+	
+	ATMO_BLE_GATTSAddCharacteristic(
+		ATMO_PROPERTY(Temperature, instance),
+		&ATMO_VARIABLE(Temperature, bleCharacteristicHandle), 
+		ATMO_VARIABLE(Temperature, bleServiceHandle), 
+		ATMO_PROPERTY(Temperature, bleCharacteristicUuid), 
+		property, permission, ATMO_GetMaxValueSize(3, 64, types));
+	
+	ATMO_BLE_GATTSRegisterCharacteristicAbilityHandle(
+		ATMO_PROPERTY(Temperature, instance),
+		ATMO_VARIABLE(Temperature, bleCharacteristicHandle), 
+		ATMO_BLE_Characteristic_Written, 
+		ATMO_ABILITY(Temperature, written));
+	
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Temperature_setValue(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	
+	// Convert to the desired write data type
+	ATMO_Value_t convertedValue;
+	ATMO_InitValue(&convertedValue);
+	ATMO_CreateValueConverted(&convertedValue, ATMO_PROPERTY(Temperature, readDataType), in);
+
+	ATMO_BLE_GATTSSetCharacteristic(
+		ATMO_PROPERTY(Temperature, instance),
+		ATMO_VARIABLE(Temperature, bleCharacteristicHandle),
+		convertedValue.size, 
+		(uint8_t *)convertedValue.data,
+		NULL);
+	
+	ATMO_FreeValue(&convertedValue);
+		
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Temperature_written(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_CreateValueConverted(out, ATMO_PROPERTY(Temperature, writeDataType), in);
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Temperature_subscibed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Temperature_unsubscribed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Humidity_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Humidity_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_BLE_GATTSAddService(
+		ATMO_PROPERTY(Humidity, instance),
+		&ATMO_VARIABLE(Humidity, bleServiceHandle), 
+		ATMO_PROPERTY(Humidity, bleServiceUuid));
+	
+	uint8_t property = 0;
+	uint8_t permission = 0;
+	
+	property |= ATMO_PROPERTY(Humidity, read) ? ATMO_BLE_Property_Read : 0;
+	property |= ATMO_PROPERTY(Humidity, write) ? ATMO_BLE_Property_Write : 0;
+	property |= ATMO_PROPERTY(Humidity, notify) ? ATMO_BLE_Property_Notify : 0;
+
+	permission |= ATMO_PROPERTY(Humidity, read) ? ATMO_BLE_Permission_Read : 0;
+	permission |= ATMO_PROPERTY(Humidity, write) ? ATMO_BLE_Permission_Write : 0;
+
+	ATMO_DATATYPE types[3] = {ATMO_PROPERTY(Humidity, writeDataType), ATMO_PROPERTY(Humidity, readDataType), ATMO_PROPERTY(Humidity, notifyDataType)};
+	
+	ATMO_BLE_GATTSAddCharacteristic(
+		ATMO_PROPERTY(Humidity, instance),
+		&ATMO_VARIABLE(Humidity, bleCharacteristicHandle), 
+		ATMO_VARIABLE(Humidity, bleServiceHandle), 
+		ATMO_PROPERTY(Humidity, bleCharacteristicUuid), 
+		property, permission, ATMO_GetMaxValueSize(3, 64, types));
+	
+	ATMO_BLE_GATTSRegisterCharacteristicAbilityHandle(
+		ATMO_PROPERTY(Humidity, instance),
+		ATMO_VARIABLE(Humidity, bleCharacteristicHandle), 
+		ATMO_BLE_Characteristic_Written, 
+		ATMO_ABILITY(Humidity, written));
+	
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Humidity_setValue(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	
+	// Convert to the desired write data type
+	ATMO_Value_t convertedValue;
+	ATMO_InitValue(&convertedValue);
+	ATMO_CreateValueConverted(&convertedValue, ATMO_PROPERTY(Humidity, readDataType), in);
+
+	ATMO_BLE_GATTSSetCharacteristic(
+		ATMO_PROPERTY(Humidity, instance),
+		ATMO_VARIABLE(Humidity, bleCharacteristicHandle),
+		convertedValue.size, 
+		(uint8_t *)convertedValue.data,
+		NULL);
+	
+	ATMO_FreeValue(&convertedValue);
+		
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Humidity_written(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_CreateValueConverted(out, ATMO_PROPERTY(Humidity, writeDataType), in);
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Humidity_subscibed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Humidity_unsubscribed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Pressure_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Pressure_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_BLE_GATTSAddService(
+		ATMO_PROPERTY(Pressure, instance),
+		&ATMO_VARIABLE(Pressure, bleServiceHandle), 
+		ATMO_PROPERTY(Pressure, bleServiceUuid));
+	
+	uint8_t property = 0;
+	uint8_t permission = 0;
+	
+	property |= ATMO_PROPERTY(Pressure, read) ? ATMO_BLE_Property_Read : 0;
+	property |= ATMO_PROPERTY(Pressure, write) ? ATMO_BLE_Property_Write : 0;
+	property |= ATMO_PROPERTY(Pressure, notify) ? ATMO_BLE_Property_Notify : 0;
+
+	permission |= ATMO_PROPERTY(Pressure, read) ? ATMO_BLE_Permission_Read : 0;
+	permission |= ATMO_PROPERTY(Pressure, write) ? ATMO_BLE_Permission_Write : 0;
+
+	ATMO_DATATYPE types[3] = {ATMO_PROPERTY(Pressure, writeDataType), ATMO_PROPERTY(Pressure, readDataType), ATMO_PROPERTY(Pressure, notifyDataType)};
+	
+	ATMO_BLE_GATTSAddCharacteristic(
+		ATMO_PROPERTY(Pressure, instance),
+		&ATMO_VARIABLE(Pressure, bleCharacteristicHandle), 
+		ATMO_VARIABLE(Pressure, bleServiceHandle), 
+		ATMO_PROPERTY(Pressure, bleCharacteristicUuid), 
+		property, permission, ATMO_GetMaxValueSize(3, 64, types));
+	
+	ATMO_BLE_GATTSRegisterCharacteristicAbilityHandle(
+		ATMO_PROPERTY(Pressure, instance),
+		ATMO_VARIABLE(Pressure, bleCharacteristicHandle), 
+		ATMO_BLE_Characteristic_Written, 
+		ATMO_ABILITY(Pressure, written));
+	
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Pressure_setValue(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	
+	// Convert to the desired write data type
+	ATMO_Value_t convertedValue;
+	ATMO_InitValue(&convertedValue);
+	ATMO_CreateValueConverted(&convertedValue, ATMO_PROPERTY(Pressure, readDataType), in);
+
+	ATMO_BLE_GATTSSetCharacteristic(
+		ATMO_PROPERTY(Pressure, instance),
+		ATMO_VARIABLE(Pressure, bleCharacteristicHandle),
+		convertedValue.size, 
+		(uint8_t *)convertedValue.data,
+		NULL);
+	
+	ATMO_FreeValue(&convertedValue);
+		
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Pressure_written(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_CreateValueConverted(out, ATMO_PROPERTY(Pressure, writeDataType), in);
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t Pressure_subscibed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t Pressure_unsubscribed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t NOA1305AmbientLight_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t NOA1305AmbientLight_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+    if(!NOA1305_Init(ATMO_PROPERTY(NOA1305AmbientLight, i2cInstance)))
+    {
+        return ATMO_Status_Fail;
+    }
+
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t NOA1305AmbientLight_readAmbientLight(ATMO_Value_t *in, ATMO_Value_t *out) {
+    uint32_t ambientLightLux = 0;
+    if(!NOA1305_GetAmbientLight(&ambientLightLux))
+    {
+        return ATMO_Status_Fail;
+    }
+    ATMO_CreateValueUnsignedInt(out, ambientLightLux);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t light_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t light_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_BLE_GATTSAddService(
+		ATMO_PROPERTY(light, instance),
+		&ATMO_VARIABLE(light, bleServiceHandle), 
+		ATMO_PROPERTY(light, bleServiceUuid));
+	
+	uint8_t property = 0;
+	uint8_t permission = 0;
+	
+	property |= ATMO_PROPERTY(light, read) ? ATMO_BLE_Property_Read : 0;
+	property |= ATMO_PROPERTY(light, write) ? ATMO_BLE_Property_Write : 0;
+	property |= ATMO_PROPERTY(light, notify) ? ATMO_BLE_Property_Notify : 0;
+
+	permission |= ATMO_PROPERTY(light, read) ? ATMO_BLE_Permission_Read : 0;
+	permission |= ATMO_PROPERTY(light, write) ? ATMO_BLE_Permission_Write : 0;
+
+	ATMO_DATATYPE types[3] = {ATMO_PROPERTY(light, writeDataType), ATMO_PROPERTY(light, readDataType), ATMO_PROPERTY(light, notifyDataType)};
+	
+	ATMO_BLE_GATTSAddCharacteristic(
+		ATMO_PROPERTY(light, instance),
+		&ATMO_VARIABLE(light, bleCharacteristicHandle), 
+		ATMO_VARIABLE(light, bleServiceHandle), 
+		ATMO_PROPERTY(light, bleCharacteristicUuid), 
+		property, permission, ATMO_GetMaxValueSize(3, 64, types));
+	
+	ATMO_BLE_GATTSRegisterCharacteristicAbilityHandle(
+		ATMO_PROPERTY(light, instance),
+		ATMO_VARIABLE(light, bleCharacteristicHandle), 
+		ATMO_BLE_Characteristic_Written, 
+		ATMO_ABILITY(light, written));
+	
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t light_setValue(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	
+	// Convert to the desired write data type
+	ATMO_Value_t convertedValue;
+	ATMO_InitValue(&convertedValue);
+	ATMO_CreateValueConverted(&convertedValue, ATMO_PROPERTY(light, readDataType), in);
+
+	ATMO_BLE_GATTSSetCharacteristic(
+		ATMO_PROPERTY(light, instance),
+		ATMO_VARIABLE(light, bleCharacteristicHandle),
+		convertedValue.size, 
+		(uint8_t *)convertedValue.data,
+		NULL);
+	
+	ATMO_FreeValue(&convertedValue);
+		
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t light_written(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_CreateValueConverted(out, ATMO_PROPERTY(light, writeDataType), in);
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t light_subscibed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t light_unsubscribed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+    BHI160_Config_t config;
+    config.i2cInstance = ATMO_PROPERTY(EmbeddedBHI160, i2cInstance);
+    config.gpioInstance = ATMO_PROPERTY(EmbeddedBHI160, gpioInstance);
+    config.intPin = ATMO_PROPERTY(EmbeddedBHI160, intPin);
+
+    if(!BHI160_Init(&config))
+    {
+        return ATMO_Status_Fail;
+    }
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_xAcceleration(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(&data, NULL, NULL);
+    ATMO_CreateValueFloat(out, data.x);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_yAcceleration(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(&data, NULL, NULL);
+    ATMO_CreateValueFloat(out, data.y);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_zAcceleration(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(&data, NULL, NULL);
+    ATMO_CreateValueFloat(out, data.z);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_acceleration(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(&data, NULL, NULL);
+    ATMO_CreateValue3dVectorFloat(out, &data);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_angularRate(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, &data, NULL);
+    ATMO_CreateValue3dVectorFloat(out, &data);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_xAngularRate(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, &data, NULL);
+    ATMO_CreateValueFloat(out, data.x);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_yAngularRate(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, &data, NULL);
+    ATMO_CreateValueFloat(out, data.y);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_zAngularRate(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, &data, NULL);
+    ATMO_CreateValueFloat(out, data.z);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_orientation(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, NULL, &data);
+    ATMO_CreateValue3dVectorFloat(out, &data);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_xOrientation(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, NULL, &data);
+    ATMO_CreateValueFloat(out, data.x);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_yOrientation(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, NULL, &data);
+    ATMO_CreateValueFloat(out, data.y);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t EmbeddedBHI160_zOrientation(ATMO_Value_t *in, ATMO_Value_t *out) {
+    ATMO_3dFloatVector_t data;
+    BHI160_GetData(NULL, NULL, &data);
+    ATMO_CreateValueFloat(out, data.z);
+    return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t acceleration_trigger(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t acceleration_setup(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_BLE_GATTSAddService(
+		ATMO_PROPERTY(acceleration, instance),
+		&ATMO_VARIABLE(acceleration, bleServiceHandle), 
+		ATMO_PROPERTY(acceleration, bleServiceUuid));
+	
+	uint8_t property = 0;
+	uint8_t permission = 0;
+	
+	property |= ATMO_PROPERTY(acceleration, read) ? ATMO_BLE_Property_Read : 0;
+	property |= ATMO_PROPERTY(acceleration, write) ? ATMO_BLE_Property_Write : 0;
+	property |= ATMO_PROPERTY(acceleration, notify) ? ATMO_BLE_Property_Notify : 0;
+
+	permission |= ATMO_PROPERTY(acceleration, read) ? ATMO_BLE_Permission_Read : 0;
+	permission |= ATMO_PROPERTY(acceleration, write) ? ATMO_BLE_Permission_Write : 0;
+
+	ATMO_DATATYPE types[3] = {ATMO_PROPERTY(acceleration, writeDataType), ATMO_PROPERTY(acceleration, readDataType), ATMO_PROPERTY(acceleration, notifyDataType)};
+	
+	ATMO_BLE_GATTSAddCharacteristic(
+		ATMO_PROPERTY(acceleration, instance),
+		&ATMO_VARIABLE(acceleration, bleCharacteristicHandle), 
+		ATMO_VARIABLE(acceleration, bleServiceHandle), 
+		ATMO_PROPERTY(acceleration, bleCharacteristicUuid), 
+		property, permission, ATMO_GetMaxValueSize(3, 64, types));
+	
+	ATMO_BLE_GATTSRegisterCharacteristicAbilityHandle(
+		ATMO_PROPERTY(acceleration, instance),
+		ATMO_VARIABLE(acceleration, bleCharacteristicHandle), 
+		ATMO_BLE_Characteristic_Written, 
+		ATMO_ABILITY(acceleration, written));
+	
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t acceleration_setValue(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	
+	// Convert to the desired write data type
+	ATMO_Value_t convertedValue;
+	ATMO_InitValue(&convertedValue);
+	ATMO_CreateValueConverted(&convertedValue, ATMO_PROPERTY(acceleration, readDataType), in);
+
+	ATMO_BLE_GATTSSetCharacteristic(
+		ATMO_PROPERTY(acceleration, instance),
+		ATMO_VARIABLE(acceleration, bleCharacteristicHandle),
+		convertedValue.size, 
+		(uint8_t *)convertedValue.data,
+		NULL);
+	
+	ATMO_FreeValue(&convertedValue);
+		
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t acceleration_written(ATMO_Value_t *in, ATMO_Value_t *out) {
+
+	ATMO_CreateValueConverted(out, ATMO_PROPERTY(acceleration, writeDataType), in);
+	return ATMO_Status_Success;
+	
+}
+
+
+ATMO_Status_t acceleration_subscibed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+
+ATMO_Status_t acceleration_unsubscribed(ATMO_Value_t *in, ATMO_Value_t *out) {
+	return ATMO_Status_Success;
+}
+
+//FOOTER START
+
+//FOOTER END
