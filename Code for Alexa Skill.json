@@ -1,0 +1,183 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "room master",
+            "intents": [
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "TemperatureSensorIntent",
+                    "slots": [],
+                    "samples": [
+                        "amount of temperature",
+                        "value of temperature",
+                        "room temperature condition",
+                        "about temperature",
+                        "tell temperature",
+                        "how much cold my room is",
+                        "how much hot my room is",
+                        "Tell the temperature",
+                        "What is the room temperature",
+                        "What is the temperature"
+                    ]
+                },
+                {
+                    "name": "HumiditySensorIntent",
+                    "slots": [],
+                    "samples": [
+                        "value of humidity",
+                        "humidity percentage",
+                        "percentage of humidity",
+                        "amount of humidity",
+                        "humidity amount",
+                        "humidity situation",
+                        "room humidity",
+                        "about my room humidity",
+                        "what about humidity",
+                        "What is the room humidity",
+                        "What is the humidity"
+                    ]
+                },
+                {
+                    "name": "LightSensorIntent",
+                    "slots": [],
+                    "samples": [
+                        "what is the light intensity in my room",
+                        "what is the light intensity of my room",
+                        "what is the room light intensity",
+                        "about the light intensity",
+                        "about the light amount",
+                        "what is the light amount",
+                        "What is the light intensity"
+                    ]
+                },
+                {
+                    "name": "PressureSensorIntent",
+                    "slots": [],
+                    "samples": [
+                        "value of air pressure",
+                        "amount of air pressure",
+                        "value of atmospheric pressure",
+                        "amount of atmospheric pressure",
+                        "what is the atmospheric pressure",
+                        "how abou air pressure",
+                        "What is the air pressure"
+                    ]
+                },
+                {
+                    "name": "AirqualitySensorIntent",
+                    "slots": [],
+                    "samples": [
+                        "waht is the room air quality",
+                        "what about room air quality",
+                        "about room air quality",
+                        "air is good or not",
+                        "is the air is good",
+                        "what is the air purity",
+                        "about air quality",
+                        "What is the air quality"
+                    ]
+                },
+                {
+                    "name": "AllSensorIntent",
+                    "slots": [],
+                    "samples": [
+                        "about environmental condition of my room",
+                        "about environmental parameters of my room",
+                        "about room situation",
+                        "about room environmrnt",
+                        "What about room environment"
+                    ]
+                },
+                {
+                    "name": "LightRequiredIntent",
+                    "slots": [],
+                    "samples": [
+                        "is it ok to read in this illumination",
+                        "is it ok to read in this light",
+                        "is the light is enough to read",
+                        "is the light is ok to read",
+                        "is it ok to read",
+                        "is the light is enough for reading",
+                        "Is my illumination is enough for reading",
+                        "Is the illumination is enough for reading",
+                        "Is illumination is enough for reading",
+                        "Is my room light is enough for reading",
+                        "Is my room illumination is enough for reading"
+                    ]
+                },
+                {
+                    "name": "ControlLightIntent",
+                    "slots": [],
+                    "samples": [
+                        "adjust the light for my work",
+                        "I will work",
+                        "I want to work",
+                        "I want to write",
+                        "I want to read",
+                        "light on",
+                        "on light",
+                        "on the light",
+                        "turn on the light"
+                    ]
+                },
+                {
+                    "name": "ControlLightOffIntent",
+                    "slots": [],
+                    "samples": [
+                        "I want to sleep",
+                        "light off",
+                        "off light",
+                        "turn light off",
+                        "turn off the light",
+                        "off the light"
+                    ]
+                },
+                {
+                    "name": "FanOnIntent",
+                    "slots": [],
+                    "samples": [
+                        "it is hot",
+                        "reduce temperature",
+                        "i am feeling hot",
+                        "decrease temperature",
+                        "i think it is hot",
+                        "on fan",
+                        "on the fan",
+                        "turn on the fan"
+                    ]
+                },
+                {
+                    "name": "FanOffIntent",
+                    "slots": [],
+                    "samples": [
+                        "make room hot",
+                        "off fan",
+                        "turn off the fan",
+                        "turn off fan",
+                        "increase temperature"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
+}
